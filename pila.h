@@ -52,7 +52,6 @@ void *pila_ver_tope(const pila_t *pila);
 // y la pila contiene un elemento menos.
 void *pila_desapilar(pila_t *pila);
 
-
 /* *****************************************************************
  *                    PRUEBAS PARA LA PILA
  * *****************************************************************/
