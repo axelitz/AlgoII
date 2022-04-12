@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int** crear_vector(int cant) {
+int** crear_vector(size_t cant) {
 	/* Creo vector de tamaño cant */
 	int** vector = malloc(cant*sizeof(int*));
 	if (vector == NULL) {
@@ -14,12 +14,12 @@ int** crear_vector(int cant) {
 	
 	for(int i = 0; i < cant; i++) {
 		vector[i] = malloc(sizeof(int*));
-		*vector[i] = i;
+		if (vector[i] != NULL) *vector[i] = i;
 	}
 	return vector;
 }
 
-void destruir_vector(int** vector, int cant) {
+void destruir_vector(int** vector, size_t cant) {
 	/* Destruyo el vector creado */
 	for(int i = 0; i < cant; i++) {
 		free(vector[i]);
@@ -53,6 +53,10 @@ static void prueba_FIFO(void) {
 	
 	/* Puntero a observar en la prueba */
 	void* puntero = malloc(sizeof(void*));
+	if (puntero == NULL) {
+		print_test("No se pudo probar el FIFO debido a que no hay memoria dinamica para un puntero", puntero != NULL);
+		return;
+	}
 	cola_encolar(cola, puntero);
 	
 	/* Encolo un vector */
@@ -75,11 +79,10 @@ static void prueba_FIFO(void) {
 }
 
 // 3
-static void prueba_encolar_desencolar(void) {
+static void prueba_volumen_encolar_desencolar(size_t cant_elementos) {
 	cola_t* cola = cola_crear();
 	
 	/* Encolado con muchos elementos */
-	int cant_elementos = 10000;
 	int** elementos = crear_vector(cant_elementos);
 	
 	/* Encolado de elementos + Prueba de que el primero siempre corresponde al primer elemento agregado */
@@ -205,6 +208,7 @@ static void prueba_encolar_pilas_destruir(void) {
 	
 	/* Destruyo cola utilizando la función correspondiente para las pilas */
 	cola_destruir(cola,destruir_pila);
+	print_test("Se encolan pilas y luego la cola es destruida (revisar valgrind para ver el resultado de esta prueba)", cant_pilas);
 }
 
 static void prueba_encolar_vectores_destruir(void) {
@@ -223,6 +227,7 @@ static void prueba_encolar_vectores_destruir(void) {
 	
 	/* Destruyo cola utilizando la función correspondiente para los vectores */
 	cola_destruir(cola,destruir_vector_TDA);
+	print_test("Se encolan vectores y luego la cola es destruida (revisar valgrind para ver el resultado de esta prueba)", cant_vecs);
 }
 
 static void prueba_encolar_punterosdinamicos_destruir(void) {
@@ -234,19 +239,26 @@ static void prueba_encolar_punterosdinamicos_destruir(void) {
 	/* Encolado de punteros */
 	int i = 0;
 	while (i < cant_punts) {
-		cola_encolar(cola,malloc(sizeof(void*)));
+		void* puntero = malloc(sizeof(void*));
+		if (puntero == NULL) {
+			print_test("No se pudo probar el FIFO debido a que no hay memoria dinamica para un puntero", puntero != NULL);
+			cola_destruir(cola,free);
+			return;
+		}
+		cola_encolar(cola,puntero);
 		i++;
 	}
 	
 	/* Destruyo cola utilizando la función correspondiente para los punteros */
 	cola_destruir(cola,free);
+	print_test("Se encolan punteros y luego la cola es destruida (revisar valgrind para ver el resultado de esta prueba)", cant_punts);
 }
 
 void pruebas_cola_estudiante() {
     /* Ejecuta todas las pruebas. */
     prueba_crear_destruir(); // 1
     prueba_FIFO(); // 2
-    prueba_encolar_desencolar(); // 3
+    prueba_volumen_encolar_desencolar(10000); // 3
     prueba_encolar_null(); // 4
     prueba_encolar_vaciar_recien_creada(); // 5 + 8
     prueba_cola_recien_creada_desencolar_ver_primero(); // 6
