@@ -84,7 +84,7 @@ bool cola_encolar(cola_t *cola, void *valor){
 // Pre: la cola fue creada.
 // Post: se devolvió el primer elemento de la cola, cuando no está vacía.
 void *cola_ver_primero(const cola_t *cola){
-	return cola->primero == NULL ? NULL : cola->primero->dato;
+	return cola_esta_vacia(cola) ? NULL : cola->primero->dato;
 }
 
 // Saca el primer elemento de la cola. Si la cola tiene elementos, se quita el
@@ -93,7 +93,7 @@ void *cola_ver_primero(const cola_t *cola){
 // Post: se devolvió el valor del primer elemento anterior, la cola
 // contiene un elemento menos, si la cola no estaba vacía.
 void *cola_desencolar(cola_t *cola){
-	if (cola->primero == NULL) return NULL;
+	if (cola_esta_vacia(cola)) return NULL;
 	if (cola->primero->prox == NULL) cola->ultimo = NULL;
 	
 	void* valor = cola->primero->dato;
