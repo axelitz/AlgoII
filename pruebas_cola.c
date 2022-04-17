@@ -64,6 +64,10 @@ static void prueba_FIFO(void) {
 	/* Encolo un vector */
 	int cant_elementos = 5;
 	int** elementos = crear_vector(cant_elementos);
+	if (elementos == NULL) {
+		print_test("No se pudo probar el FIFO debido a que no hay memoria dinamica para un vector de elementos", elementos != NULL);
+		return;
+	}
 	
 	int i = 0;
 	while (i < cant_elementos) {
@@ -86,6 +90,10 @@ static void prueba_volumen_encolar_desencolar(size_t cant_elementos) {
 	
 	/* Encolado con muchos elementos */
 	int** elementos = crear_vector(cant_elementos);
+	if (elementos == NULL) {
+		print_test("No se pudo realizar la prueba de volumen debido a que no hay memoria dinamica para un vector de elementos", elementos != NULL);
+		return;
+	}
 	
 	/* Encolado de elementos + Prueba de que el primero siempre corresponde al primer elemento agregado */
 	bool encolado = true;
@@ -142,6 +150,10 @@ static void prueba_encolar_vaciar_recien_creada(void) {
 	/* Encolado con muchos elementos */
 	int cant_elementos = 10000;
 	int** elementos = crear_vector(cant_elementos);
+	if (elementos == NULL) {
+		print_test("No se pudo realizar la prueba de la cola vaciada debido a que no hay memoria dinamica para un vector de elementos", elementos != NULL);
+		return;
+	}
 	
 	/* Encolado de elementos */
 	int i = 0;
