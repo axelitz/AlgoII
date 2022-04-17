@@ -5,26 +5,28 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int** crear_vector(size_t cant) {
-	/* Creo vector de tamaño cant */
-	int** vector = malloc(cant*sizeof(int*));
-	if (vector == NULL) {
-		return NULL;
-	}
-	
-	for(int i = 0; i < cant; i++) {
-		vector[i] = malloc(sizeof(int*));
-		if (vector[i] != NULL) *vector[i] = i;
-	}
-	return vector;
-}
-
 void destruir_vector(int** vector, size_t cant) {
 	/* Destruyo el vector creado */
 	for(int i = 0; i < cant; i++) {
 		free(vector[i]);
 	}
 	free(vector);
+}
+
+int** crear_vector(size_t cant) {
+	/* Creo vector de tamaño cant */
+	int** vector = malloc(cant*sizeof(int*));
+	if (vector == NULL) return NULL;
+	
+	for(int i = 0; i < cant; i++) {
+		vector[i] = malloc(sizeof(int*));
+		if (vector[i] == NULL) {
+			destruir_vector(vector, i-1);
+			return NULL;
+		}
+		*vector[i] = i;
+	}
+	return vector;
 }
 
 void destruir_pila(void* pila) {
