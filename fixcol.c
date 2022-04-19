@@ -18,7 +18,7 @@ void dividir_archivo(int cantidad_columnas, FILE* archivo_lectura) {
 			columnas++;
 		}
 		if (columnas == cantidad_columnas && caracter_leido != '\n') fputc('\n', stdout);
-		if (caracter_leido == '\n' || columnas == cantidad_columnas) columnas = 0;
+		if (columnas == cantidad_columnas || caracter_leido == '\n') columnas = 0;
 	}
 }
 
