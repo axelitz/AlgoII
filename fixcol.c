@@ -13,9 +13,11 @@ void dividir_archivo(int cantidad_columnas, FILE* archivo_lectura) {
 	int caracter_leido;
 	int columnas = 0;
 	while ((caracter_leido = fgetc(archivo_lectura)) != EOF) {
-		fputc(caracter_leido, stdout);
-		columnas++;
-		if (columnas == cantidad_columnas) fputc('\n', stdout);
+		if (!(columnas == 0 && caracter_leido == '\n')) {
+			fputc(caracter_leido, stdout);
+			columnas++;
+		}
+		if (columnas == cantidad_columnas && caracter_leido != '\n') fputc('\n', stdout);
 		if (caracter_leido == '\n' || columnas == cantidad_columnas) columnas = 0;
 	}
 }
