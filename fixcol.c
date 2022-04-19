@@ -23,7 +23,7 @@ void dividir_archivo(int cantidad_columnas, FILE* archivo_lectura) {
 int validar_cantidad_columnas(int argc, char* argv []) {
 	int cantidad_columnas = 0;
 
-	if (argc < 2 || argc > 3 || (cantidad_columnas = atoi(argv[1])) == 0) fprintf(stderr, "ERROR: Cantidad erronea de parametros\n");
+	if (argc < 2 || argc > 3 || (cantidad_columnas = atoi(argv[1])) == 0) fprintf(stderr, "Error: Cantidad erronea de parametros\n");
 	
 	return cantidad_columnas;
 }
