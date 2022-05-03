@@ -41,11 +41,67 @@ bool duplicar_elementos_de_lista(void* elemento, void* dato) {
 	return true;
 }
 
+bool obtener_primer_elemento_iter_interno(void* dato, void* extra) {
+	(*(int*)extra) = (*(int*)dato);
+	return false;
+}
+
+bool obtener_ultimo_elemento_iter_interno(void* dato, void* extra) {
+	(*(int*)extra) = (*(int*)dato);
+	return true;
+}
+
+bool obtener_elementos_iter_interno(void* dato, void* extra) {
+	int* elementos_obtenidos = (int*)extra;
+	int* i = &elementos_obtenidos[10];
+	
+	(elementos_obtenidos[*i]) = (*(int*)dato);
+	(*i)++;
+	
+	return true;
+}
+
+bool sumar_elementos_iter_interno(void* dato, void* extra) {
+	int* aux = (int*)extra;
+	int* acumulador = &aux[0];
+	
+	(*acumulador) += (*(int*)dato);
+		
+	return true;
+}
+
+bool sumar_primeros_x_elementos_iter_interno(void* dato, void* extra) {
+	int* aux = (int*)extra;
+	int* cant_elementos = &aux[0];
+	int* contador = &aux[1];
+	int* acumulador = &aux[2];
+	
+	if (*contador >= *cant_elementos) return false;
+	(*contador)++;
+	(*acumulador) += (*(int*)dato);
+	
+	return true;
+}
+
+bool factorial_primeros_x_elementos_iter_interno(void* dato, void* extra) {
+	int* aux = (int*)extra;
+	int* factorial = &aux[0];
+	int* contador = &aux[1];
+	int* acumulador = &aux[2];
+	
+	if (*contador >= *factorial) return false;
+	(*contador)++;
+	(*acumulador) = (*acumulador) * (*(int*)dato);
+	
+	return true;
+}
+
 /* *****************************************************************
  *               	FUNCIONES DE PRUEBA
  * *****************************************************************/
 
 static void prueba_crear_destruir(void) {
+	printf("\nINICIO DE PRUEBAS CREAR Y DESTRUIR\n");
 	/* Prueba de lista creada correctamente */
 	lista_t* lista = lista_crear();
 	print_test("La lista se pudo crear", lista != NULL);
@@ -55,6 +111,7 @@ static void prueba_crear_destruir(void) {
 }
 
 static void prueba_largo_lista(void) {
+	printf("\nINICIO DE PRUEBAS DE LARGO DE LISTA\n");
 	lista_t* lista = lista_crear();
 	
 	/* Prueba de correcta longitud de vector */
@@ -93,6 +150,7 @@ static void prueba_largo_lista(void) {
 }
 
 static void prueba_enlistar_alternadamente(void) {
+	printf("\nINICIO DE PRUEBAS DE ENLISTAR ALTERNADAMENTE\n");
 	lista_t* lista = lista_crear();
 	
 	/* Vector de prueba */
@@ -132,6 +190,7 @@ static void prueba_enlistar_alternadamente(void) {
 }
 
 static void prueba_volumen_primero(size_t cant_elementos) {
+	printf("\nINICIO DE PRUEBAS DE VOLUMEN (INSERTAR POR PRIMERO)\n");
 	lista_t* lista = lista_crear();
 	
 	/* Enlistado con muchos elementos */
@@ -174,6 +233,7 @@ static void prueba_volumen_primero(size_t cant_elementos) {
 }
 
 static void prueba_volumen_ultimo(size_t cant_elementos) {
+	printf("\nINICIO DE PRUEBAS DE VOLUMEN (INSERTAR POR ULTIMO)\n");
 	lista_t* lista = lista_crear();
 	
 	/* Enlistado con muchos elementos */
@@ -216,6 +276,7 @@ static void prueba_volumen_ultimo(size_t cant_elementos) {
 }
 
 static void prueba_enlistar_null(void) {
+	printf("\nINICIO DE PRUEBAS DE ENLISTAR NULL\n");
 	lista_t* lista = lista_crear();
 	
 	/* Enlistado con muchos elementos */
@@ -247,6 +308,7 @@ static void prueba_enlistar_null(void) {
 }
 
 static void prueba_enlistar_vaciar_recien_creada(void) {
+	printf("\nINICIO DE PRUEBAS DE VACIAR UNA LISTA RECIÉN CREADA\n");
 	lista_t* lista = lista_crear();
 	
 	/* Enlistado con muchos elementos */
@@ -276,6 +338,7 @@ static void prueba_enlistar_vaciar_recien_creada(void) {
 }
 
 static void prueba_lista_recien_creada_desenlistar_ver_primero(void) {
+	printf("\nINICIO DE PRUEBAS DE DESENLISTAR UNA LISTA RECIÉN CREADA\n");
 	lista_t* lista = lista_crear();
 
 	/* Prueba de ver primero vacío y de no poder desenlistar al recién crear la lista */
@@ -288,16 +351,18 @@ static void prueba_lista_recien_creada_desenlistar_ver_primero(void) {
 }
 
 static void prueba_lista_recien_creada_vacia(void) {
+	printf("\nINICIO DE PRUEBAS DE LISTA RECIEN CREADA ESTA VACIA\n");
 	lista_t* lista = lista_crear();
 
 	/* Prueba de lista vacía al crearse */
-	print_test("La cola al recién crearse está vacía", lista_esta_vacia(lista) == true);
+	print_test("La lista al recién crearse está vacía", lista_esta_vacia(lista) == true);
 	
 	/* Destruyo lista */
 	lista_destruir(lista, NULL);
 }
 
 static void prueba_destruir_lista_vacia_sin_funcion(void) {
+	printf("\nINICIO DE PRUEBAS DE DESTRUIR UNA LISTA VACIA SIN FUNCION\n");
 	lista_t* lista = lista_crear();
 
 	/* Prueba de destruir lista vacía con función de destrucción */
@@ -308,6 +373,7 @@ static void prueba_destruir_lista_vacia_sin_funcion(void) {
 }
 
 static void prueba_destruir_lista_vacia_con_funcion(void) {
+	printf("\nINICIO DE PRUEBAS DE DESTRUIR UNA LISTA VACIA CON FUNCION\n");
 	lista_t* lista = lista_crear();
 
 	/* Prueba de destruir lista vacía con función de destrucción */
@@ -318,6 +384,7 @@ static void prueba_destruir_lista_vacia_con_funcion(void) {
 }
 
 static void prueba_enlistar_colas_destruir(void) {
+	printf("\nINICIO DE PRUEBAS DE ENLISTAR Y DESTRUIR COLAS\n");
 	lista_t* lista = lista_crear();
 	
 	/* Enlistado con muchas colas */
@@ -338,6 +405,7 @@ static void prueba_enlistar_colas_destruir(void) {
 }
 
 static void prueba_enlistar_pilas_destruir(void) {
+	printf("\nINICIO DE PRUEBAS DE ENLISTAR Y DESTRUIR PILAS\n");
 	lista_t* lista = lista_crear();
 	
 	/* Enlistado con muchas pilas */
@@ -358,6 +426,7 @@ static void prueba_enlistar_pilas_destruir(void) {
 }
 
 static void prueba_enlistar_vectores_destruir(void) {
+	printf("\nINICIO DE PRUEBAS DE ENLISTAR Y DESTRUIR VECTORES\n");
 	lista_t* lista = lista_crear();
 	
 	/* Enlistado con muchos vectores */
@@ -379,6 +448,7 @@ static void prueba_enlistar_vectores_destruir(void) {
 }
 
 static void prueba_enlistar_punterosdinamicos_destruir(void) {
+	printf("\nINICIO DE PRUEBAS DE ENLISTAR Y DESTRUIR PUNTEROS DINAMICOS\n");
 	lista_t* lista = lista_crear();
 	
 	/* Enlistado con muchos punteros */
@@ -405,85 +475,8 @@ static void prueba_enlistar_punterosdinamicos_destruir(void) {
 	print_test("Se enlistan punteros y luego la lista es destruida (revisar valgrind para ver el resultado de esta prueba)", cant_punts);
 }
 
-static void prueba_iterador_interno_sin_corte(void) {
-	lista_t* lista = lista_crear();
-	
-	/* Enlistado con elementos a través del último */
-	int elementos[] = {1,2,3,4,5,6,7,8,9,10};
-	int cant_elementos = 10;
-	int suma_elementos = 0;
-	for (int i = 0; i < cant_elementos; i++) {
-		if (!lista_insertar_ultimo(lista,&elementos[i])) {
-			print_test("No se pudo realizar la prueba del iterador interno sin condición de corte debido a que no se pudo insertar correctamente los elementos", false);
-			lista_destruir(lista, NULL);
-			return;
-		}
-		suma_elementos += elementos[i];
-	}
-	
-	/* Sumo todos los elementos de la lista con el iterador interno */
-	int suma_iterador = 0;
-	lista_iterar(lista, sumar_elementos_de_lista, &suma_iterador);
-	
-	/* Verifico que la suma sea la correcta */
-	print_test("Por medio del iterador interno y sin condición de corte se recorre correctamente toda la lista", suma_elementos == suma_iterador);
-	
-	/* Destruyo lista */
-	lista_destruir(lista, NULL);
-}
-
-static void prueba_iterador_interno_con_corte(void) {
-	lista_t* lista = lista_crear();
-	
-	/* Enlistado con elementos a través del último */
-	int elementos[] = {1,2,3,4,5,6,7,8,9,10};
-	int cant_elementos = 10;
-	for (int i = 0; i < cant_elementos; i++) {
-		if (!lista_insertar_ultimo(lista,&elementos[i])) {
-			print_test("No se pudo realizar la prueba del iterador interno con condición de corte debido a que no se pudo insertar correctamente los elementos", false);
-			lista_destruir(lista, NULL);
-			return;
-		}
-	}
-	
-	/* Recorro la lista hasta encontrar un elemento mayor que 5 */
-	int elemento_final = 0;
-	lista_iterar(lista, verificar_mayor_que_5, (void*)&elemento_final);
-	
-	/* Verifico que el elemento de salida del iterador sea mayor que 5 */
-	print_test("Por medio del iterador interno y con condición de corte se recorre correctamente toda la lista", elemento_final > 5);
-	
-	/* Destruyo lista */
-	lista_destruir(lista, NULL);
-}
-
-static void prueba_iterador_interno_sin_extra(void) {
-	lista_t* lista = lista_crear();
-	
-	/* Enlistado con elementos a través del último */
-	int elementos[] = {1,2,3,4,5,6,7,8,9,10};
-	int cant_elementos = 10;
-	for (int i = 0; i < cant_elementos; i++) {
-		if (!lista_insertar_ultimo(lista,&elementos[i])) {
-			print_test("No se pudo realizar la prueba del iterador interno sin dato extra debido a que no se pudo insertar correctamente los elementos", false);
-			lista_destruir(lista, NULL);
-			return;
-		}
-	}
-	
-	/* Recorro la lista duplicando los elementos de la lista */
-	lista_iterar(lista, duplicar_elementos_de_lista, NULL);
-	
-	/* Verifico que cada elemento de la lista se haya duplicado */
-	bool duplicado = true;
-	for (int i = 0; i < cant_elementos; i++) if (*(int*)lista_borrar_primero(lista) != 2*(i+1)) duplicado = false;
-	print_test("Por medio del iterador interno y sin un dato extra se recorre correctamente toda la lista", duplicado == true);
-	
-	/* Destruyo lista */
-	lista_destruir(lista, NULL);
-}
-
 static void prueba_iterador_externo_insertar_principio(void) {
+	printf("\nINICIO DE PRUEBAS DE INSERTAR UN ELEMENTO AL PRINCIPIO CON ITERADOR EXTERNO\n");
 	lista_t* lista = lista_crear();
 	
 	/* Enlistado con elementos a través del último */
@@ -521,7 +514,69 @@ static void prueba_iterador_externo_insertar_principio(void) {
 	lista_destruir(lista, NULL);
 }
 
+static void prueba_iterador_externo_insertar_medio(void) {
+	printf("\nINICIO DE PRUEBAS DE INSERTAR UN ELEMENTO EN EL MEDIO CON ITERADOR EXTERNO\n");
+	lista_t* lista = lista_crear();
+	
+	/* Enlistado con elementos a través del último */
+	int elementos[] = {1,2,3,4,5,6,7,8,9,10};
+	int cant_elementos = 10;
+	for (int i = 0; i < cant_elementos; i++) {
+		if(!lista_insertar_ultimo(lista,&elementos[i])) {
+			print_test("No se pudo probar que el iterador externo inserta al medio de la lista debido a que no se pudo insertar correctamente los elementos", false);
+			lista_destruir(lista, NULL);
+			return;
+		}
+	}
+	
+	/* Avanzo hasta el medio de la lista con el iterador */
+	lista_iter_t* iter = lista_iter_crear(lista);
+	size_t lista_mitad = lista_largo(lista)/2;
+	size_t cont_avance = 0;
+	if (iter == NULL) {
+		print_test("No se pudo probar que el iterador externo inserta al medio de la lista debido a que no se pudo crear el iterador", iter != NULL);
+		lista_destruir(lista,free);
+		return;
+	}
+	while (cont_avance != lista_mitad) {
+		lista_iter_avanzar(iter);
+		cont_avance++;
+	}
+	
+	/* Inserto un elemento */
+	int primero_inicial = *(int*)lista_ver_primero(lista);
+	int medio_inicial = *(int*)lista_iter_ver_actual(iter);
+	int ultimo_inicial = *(int*)lista_ver_ultimo(lista);
+	int once = 11;
+	if (!lista_iter_insertar(iter,(void*)&once)) {
+		print_test("No se pudo probar que el iterador externo inserta al medio de la lista debido a que no se pudo insertar correctamente", false);
+		lista_destruir(lista, NULL);
+	}
+	
+	/* Verifico que el elemento se insertó al medio de la lista */
+	lista_iter_t* iter_nuevo = lista_iter_crear(lista);
+	int i = 0;
+	while (i < lista_mitad) {
+		lista_iter_avanzar(iter_nuevo);
+		i++;
+	}
+
+	print_test("El iterador externo se encuentra en el elemento insertado", *(int*)lista_iter_ver_actual(iter_nuevo) == once);
+	lista_iter_avanzar(iter_nuevo);
+	print_test("El elemento que antes se encontraba en el medio ahora es el siguiente al insertado", *(int*)lista_iter_ver_actual(iter_nuevo) == medio_inicial);
+	print_test("El iterador externo mantiene como primer elemento al que se tenía previo a insertar un elemento en el medio", *(int*)lista_ver_primero(lista) == primero_inicial);
+	print_test("El iterador externo mantiene como último elemento al que se tenía previo a insertar un elemento en el medio", *(int*)lista_ver_ultimo(lista) == ultimo_inicial);
+		
+	/* Destruyo iterador de lista */
+	lista_iter_destruir(iter);
+	lista_iter_destruir(iter_nuevo);
+	
+	/* Destruyo lista */
+	lista_destruir(lista, NULL);
+}
+
 static void prueba_iterador_externo_insertar_final(void) {
+	printf("\nINICIO DE PRUEBAS DE INSERTAR UN ELEMENTO AL FINAL CON ITERADOR EXTERNO\n");
 	lista_t* lista = lista_crear();
 	
 	/* Enlistado con elementos a través del último */
@@ -561,60 +616,8 @@ static void prueba_iterador_externo_insertar_final(void) {
 	lista_destruir(lista, NULL);
 }
 
-static void prueba_iterador_externo_insertar_medio(void) {
-	lista_t* lista = lista_crear();
-	
-	/* Enlistado con elementos a través del último */
-	int elementos[] = {1,2,3,4,5,6,7,8,9,10};
-	int cant_elementos = 10;
-	for (int i = 0; i < cant_elementos; i++) {
-		if (!lista_insertar_ultimo(lista,&elementos[i])) {
-			print_test("No se pudo probar que el iterador externo inserta correctamente en el medio de la lista debido a que no se pudo insertar correctamente los elementos", false);
-			lista_destruir(lista, NULL);
-			return;
-		}
-	}
-	
-	/* Avanzo hasta alguna posición intermedia de la lista con el iterador */
-	int pos_intermedia = cant_elementos/2;
-	lista_iter_t* iter = lista_iter_crear(lista);
-	if (iter == NULL) {
-		print_test("No se pudo probar que el iterador externo inserta correctamente en el medio de la lista debido a que no se pudo crear el iterador", iter != NULL);
-		lista_destruir(lista,free);
-		return;
-	}
-	for(int i = 0; i < pos_intermedia; i++) lista_iter_avanzar(iter);
-	
-	/* Inserto un elemento */
-	int once = 11;
-	if (!lista_iter_insertar(iter,(void*)&once)) {
-		print_test("No se pudo probar que el iterador externo inserta correctamente en el medio de la lista debido a que no se pudo insertar correctamente", false);
-		lista_destruir(lista, NULL);
-	}
-	
-	/* Destruyo primer iterador de lista */
-	lista_iter_destruir(iter);
-	
-	/* Creo segundo iterador para buscar el elemento correspondiente */
-	lista_iter_t* iter2 = lista_iter_crear(lista);
-	if (iter2 == NULL) {
-		print_test("No se pudo probar que el iterador externo inserta correctamente en el medio de la lista debido a que no se pudo crear el iterador", iter2 != NULL);
-		lista_destruir(lista,free);
-		return;
-	}
-	for(int i = 0; i < pos_intermedia; i++) lista_iter_avanzar(iter2);
-	
-	/* Verifico que el elemento donde se encuentra el iterador sea el insertado */
-	print_test("El iterador externo inserta correctamente en el medio de la lista", *(int*)lista_iter_ver_actual(iter2) == once);
-	
-	/* Destruyo iterador de lista */
-	lista_iter_destruir(iter2);
-	
-	/* Destruyo lista */
-	lista_destruir(lista, NULL);
-}
-
 static void prueba_iterador_externo_borrar_principio(void) {
+	printf("\nINICIO DE PRUEBAS DE BORRAR EL PRIMER ELEMENTO CON ITERADOR EXTERNO\n");
 	lista_t* lista = lista_crear();
 	
 	/* Enlistado con elementos a través del último */
@@ -648,7 +651,65 @@ static void prueba_iterador_externo_borrar_principio(void) {
 	lista_destruir(lista, NULL);
 }
 
+static void prueba_iterador_externo_borrar_medio(void) {
+	printf("\nINICIO DE PRUEBAS DE BORRAR EL ELEMENTO DEL MEDIO CON ITERADOR EXTERNO\n");
+	lista_t* lista = lista_crear();
+	
+	/* Enlistado con elementos a través del último */
+	int elementos[] = {1,2,3,4,5,6,7,8,9,10};
+	int cant_elementos = 10;
+	for (int i = 0; i < cant_elementos; i++) {
+		if(!lista_insertar_ultimo(lista,&elementos[i])) {
+			print_test("No se pudo probar que el iterador externo borra el elemento del medio de la lista debido a que no se pudo insertar correctamente los elementos", false);
+			lista_destruir(lista, NULL);
+			return;
+		}
+	}
+
+	/* Avanzo hasta el medio de la lista con el iterador */
+	lista_iter_t* iter = lista_iter_crear(lista);
+	size_t lista_mitad = lista_largo(lista)/2;
+	size_t cont_avance = 0;
+	if (iter == NULL) {
+		print_test("No se pudo probar que el iterador externo borra el elemento del medio de la lista debido a que no se pudo crear el iterador", iter != NULL);
+		lista_destruir(lista,free);
+		return;
+	}
+	while (cont_avance != lista_mitad) {
+		lista_iter_avanzar(iter);
+		cont_avance++;
+	}
+	
+	/* Borro un elemento */
+	int medio_borrar = *(int*)lista_iter_ver_actual(iter);
+	int primero_inicial = *(int*)lista_ver_primero(lista);
+	int ultimo_inicial = *(int*)lista_ver_ultimo(lista);
+	
+	/* Verifico que el elemento del medio se borre de la lista */
+	print_test("El iterador externo borró el elemento del medio", *(int*)lista_iter_borrar(iter) == medio_borrar);
+	
+	/* Verifico que la lista cambió como se esperaba tras borrar el elemento en el medio */
+	lista_iter_t* iter_nuevo = lista_iter_crear(lista);
+	int i = 0;
+	while (i < lista_mitad) {
+		lista_iter_avanzar(iter_nuevo);
+		i++;
+	}
+	
+	print_test("El elemento que se encuentra en el medio ya no es el que se quiso borrar", *(int*)lista_iter_ver_actual(iter_nuevo) != medio_borrar);
+	print_test("El iterador externo mantiene como primer elemento al que se tenía previo a borrar el elemento del medio", *(int*)lista_ver_primero(lista) == primero_inicial);
+	print_test("El iterador externo mantiene como último elemento al que se tenía previo a borrar el elemento del medio", *(int*)lista_ver_ultimo(lista) == ultimo_inicial);
+	
+	/* Destruyo iterador de lista */
+	lista_iter_destruir(iter);
+	lista_iter_destruir(iter_nuevo);
+	
+	/* Destruyo lista */
+	lista_destruir(lista, NULL);
+}
+
 static void prueba_iterador_externo_borrar_final(void) {
+	printf("\nINICIO DE PRUEBAS DE BORRAR EL ELEMENTO FINAL CON ITERADOR EXTERNO\n");
 	lista_t* lista = lista_crear();
 	
 	/* Enlistado con elementos a través del último */
@@ -683,82 +744,122 @@ static void prueba_iterador_externo_borrar_final(void) {
 	lista_destruir(lista, NULL);
 }
 
-static void prueba_iterador_externo_borrar_medio(void) {
+static void prueba_iterador_interno_vacio(void) {
+	printf("\nINICIO DE PRUEBAS DE LISTA VACIA CON ITERADOR INTERNO\n");
 	lista_t* lista = lista_crear();
 	
-	/* Enlistado con elementos a través del último */
-	int elementos[] = {1,2,3,4,5,6,7,8,9,10};
-	int cant_elementos = 10;
-	for (int i = 0; i < cant_elementos; i++) {
-		if (!lista_insertar_ultimo(lista,&elementos[i])) {
-			print_test("No se pudo probar que el iterador externo inserta correctamente en el medio de la lista debido a que no se pudo insertar correctamente los elementos", false);
-			lista_destruir(lista, NULL);
-			return;
-		}
-	}
+	/* Pruebas con el iterador interno vacío*/
+	int primero = 0;
+	lista_iterar(lista, obtener_primer_elemento_iter_interno, &primero);
+	print_test("El iterador interno no puede obtener el primer elemento de la lista si está vacía", primero == 0);
 	
-	/* Avanzo hasta alguna posición intermedia de la lista con el iterador */
-	int pos_intermedia = cant_elementos/2;
-	lista_iter_t* iter = lista_iter_crear(lista);
-	if (iter == NULL) {
-		print_test("No se pudo probar que el iterador externo inserta correctamente en el medio de la lista debido a que no se pudo crear el iterador", iter != NULL);
-		lista_destruir(lista,free);
-		return;
-	}
-	for(int i = 0; i < pos_intermedia; i++) lista_iter_avanzar(iter);
-	
-	/* Borro un elemento */
-	int elemento_borrado = *(int*)lista_iter_borrar(iter);
-	
-	/* Destruyo primer iterador de lista */
-	lista_iter_destruir(iter);
-	
-	/* Creo segundo iterador para buscar el elemento correspondiente */
-	lista_iter_t* iter2 = lista_iter_crear(lista);
-	if (iter2 == NULL) {
-		print_test("No se pudo probar que el iterador externo inserta correctamente en el medio de la lista debido a que no se pudo crear el iterador", iter2 != NULL);
-		lista_destruir(lista,free);
-		return;
-	}
-	for(int i = 0; i < pos_intermedia; i++) lista_iter_avanzar(iter2);
-	
-	/* Verifico que el elemento donde se encuentra el iterador no sea el que se borró */
-	print_test("El iterador externo borra correctamente en el medio de la lista", *(int*)lista_iter_ver_actual(iter2) != elemento_borrado);
-	
-	/* Destruyo iterador de lista */
-	lista_iter_destruir(iter2);
+	int ultimo = 0;
+	lista_iterar(lista, obtener_ultimo_elemento_iter_interno, &ultimo);
+	print_test("El iterador interno no puede obtener el ultimo elemento de la lista si está vacía", ultimo == 0);
 	
 	/* Destruyo lista */
 	lista_destruir(lista, NULL);
 }
 
+static void prueba_iterador_interno_operaciones_sin_corte(void) {
+	printf("\nINICIO DE PRUEBAS DE OPERACIONES CON ITERADOR INTERNO SIN CONDICION DE CORTE\n");
+	lista_t* lista = lista_crear();
+	
+	/* Inserto elementos a la lista a través del último */
+	int elementos[] = {1,2,3,4,5,6,7,8,9,10};
+	int cant_elementos = 10;
+	for (int i = 0; i < cant_elementos; i++) {
+		if (!lista_insertar_ultimo(lista,&elementos[i])) {
+			print_test("Fallaron las pruebas del interador interno debido a que no se pudo insertar correctamente los elementos con el iterador externo", false);
+			lista_destruir(lista, NULL);
+			return;
+		}
+	}
+	
+	/* Pruebo el iterador interno */
+	int elementos_obtenidos[cant_elementos+1];
+	elementos_obtenidos[cant_elementos] = 0; /* contador */
+	bool ok_obtenidos = true;
+	lista_iterar(lista, obtener_elementos_iter_interno, &elementos_obtenidos);
+	for (int i = 0; i < cant_elementos; i++) {
+		ok_obtenidos &= (elementos[i] == elementos_obtenidos[i]);
+		if (!ok_obtenidos) {
+			break;
+		}
+	}
+	print_test("Se pudieron obtener todos los elementos de la lista utilizando el iterador interno", ok_obtenidos);
+	
+	int ultimo = 0;
+	lista_iterar(lista, obtener_ultimo_elemento_iter_interno, &ultimo);
+	print_test("El iterador interno obtiene el ultimo elemento de la lista", ultimo == elementos[cant_elementos-1]);
+	
+	int suma_todos = 0;
+	lista_iterar(lista, sumar_elementos_iter_interno, &suma_todos);
+	print_test("Se pudieron sumar los valores de todos los elementos utilizando el iterador interno", suma_todos == 55);
+	
+	/* Destruyo lista */
+	lista_destruir(lista, NULL);
+}
+
+static void prueba_iterador_interno_operaciones_con_corte(void) {
+	printf("\nINICIO DE PRUEBAS DE OPERACIONES CON ITERADOR INTERNO CON CONDICION DE CORTE\n");
+	lista_t* lista = lista_crear();
+	
+	/* Inserto elementos a la lista a través del último */
+	int elementos[] = {1,2,3,4,5,6,7,8,9,10};
+	int cant_elementos = 10;
+	for (int i = 0; i < cant_elementos; i++) {
+		if (!lista_insertar_ultimo(lista,&elementos[i])) {
+			print_test("Fallaron las pruebas del interador interno debido a que no se pudo insertar correctamente los elementos con el iterador externo", false);
+			lista_destruir(lista, NULL);
+			return;
+		}
+	}
+	
+	/* Pruebo el iterador interno */
+	int primero = 0;
+	lista_iterar(lista, obtener_primer_elemento_iter_interno, &primero);
+	print_test("El iterador interno obtiene el primer elemento de la lista", primero == elementos[0]);
+	
+	int suma_cinco[] = {5,0,0}; /* {cantidad de elementos de la lista a sumar, contador, acumulador} */
+	lista_iterar(lista, sumar_primeros_x_elementos_iter_interno, &suma_cinco);
+	print_test("Se pudieron sumar los valores de los primeros cinco elementos utilizando el iterador interno", suma_cinco[2] == 15);
+	
+	int factorial_cinco[] = {5,0,1}; /* {factorial pedido, contador, acumulador} */
+	lista_iterar(lista, factorial_primeros_x_elementos_iter_interno, &factorial_cinco);
+	print_test("Se pudo calcular el factorial de 5 usando los valores de los primeros cinco elementos mediante el iterador interno", factorial_cinco[2] == 120);
+	
+	/* Destruyo lista */
+	lista_destruir(lista, NULL);
+}
 
 void pruebas_lista_estudiante() {
-    /* Ejecuta todas las pruebas. */
-    prueba_crear_destruir();
-    prueba_largo_lista();
-    prueba_enlistar_alternadamente();
-    prueba_volumen_primero(10000);
-    prueba_volumen_ultimo(10000);
-    prueba_enlistar_null();
-    prueba_enlistar_vaciar_recien_creada();
-    prueba_lista_recien_creada_desenlistar_ver_primero();
-    prueba_lista_recien_creada_vacia();
-    prueba_destruir_lista_vacia_sin_funcion();
-    prueba_destruir_lista_vacia_con_funcion();
-    prueba_enlistar_colas_destruir();
-    prueba_enlistar_pilas_destruir();
-    prueba_enlistar_vectores_destruir();
-    prueba_enlistar_punterosdinamicos_destruir();
-    prueba_iterador_interno_sin_corte();
-    prueba_iterador_interno_con_corte();
-    prueba_iterador_interno_sin_extra();
-    prueba_iterador_externo_insertar_principio();
-    prueba_iterador_externo_insertar_final();
-    prueba_iterador_externo_insertar_medio();
-    prueba_iterador_externo_borrar_principio();
-    prueba_iterador_externo_borrar_final();
-    prueba_iterador_externo_borrar_medio();
+	/* Ejecuta todas las pruebas. */
+	printf("INICIO DE PRUEBAS UNITARIAS\n");
+	prueba_crear_destruir();
+	prueba_largo_lista();
+	prueba_enlistar_alternadamente();
+	prueba_volumen_primero(10000);
+	prueba_volumen_ultimo(10000);
+	prueba_enlistar_null();
+	prueba_enlistar_vaciar_recien_creada();
+	prueba_lista_recien_creada_desenlistar_ver_primero();
+	prueba_lista_recien_creada_vacia();
+	prueba_destruir_lista_vacia_sin_funcion();
+	prueba_destruir_lista_vacia_con_funcion();
+	prueba_enlistar_colas_destruir();
+	prueba_enlistar_pilas_destruir();
+	prueba_enlistar_vectores_destruir();
+	prueba_enlistar_punterosdinamicos_destruir();
+	prueba_iterador_externo_insertar_principio();
+	prueba_iterador_externo_insertar_medio();
+	prueba_iterador_externo_insertar_final();
+	prueba_iterador_externo_borrar_principio();
+	prueba_iterador_externo_borrar_medio();
+	prueba_iterador_externo_borrar_final();
+	prueba_iterador_interno_vacio();
+	prueba_iterador_interno_operaciones_sin_corte();
+	prueba_iterador_interno_operaciones_con_corte();
 }
 
 /*
@@ -768,8 +869,8 @@ void pruebas_lista_estudiante() {
 #ifndef CORRECTOR  // Para que no dé conflicto con el main() del corrector.
 
 int main(void) {
-    pruebas_lista_estudiante();
-    return failure_count() > 0;  // Indica si falló alguna prueba.
+	pruebas_lista_estudiante();
+	return failure_count() > 0;  // Indica si falló alguna prueba.
 }
 
 #endif
