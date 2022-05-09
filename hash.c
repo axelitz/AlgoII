@@ -200,8 +200,8 @@ bool hash_guardar(hash_t* hash, const char* clave, void* dato) {
 	if (!redimensionamiento(hash)) return false;
 
 	if (hash_pertenece(hash, clave)) {
-		void* dato = hash_borrar(hash, clave);
-		if (hash->destruir_dato != NULL) hash->destruir_dato(dato);
+		void* dato_borrado = hash_borrar(hash, clave);
+		if (hash->destruir_dato != NULL) hash->destruir_dato(dato_borrado);
 	}
 
 	hash->cantidad++;
