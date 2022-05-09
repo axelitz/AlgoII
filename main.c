@@ -11,7 +11,7 @@ void pruebas_hash_catedra(void);
 void pruebas_volumen_catedra(size_t);
 
 int main(int argc, char *argv[]) {
-#ifdef CORRECTOR
+#ifndef CORRECTOR
     if (argc > 1) {
         // Asumimos que nos están pidiendo pruebas de volumen.
         long largo = strtol(argv[1], NULL, 10);

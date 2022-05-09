@@ -164,6 +164,19 @@ bool redimensionamiento(hash_t* hash) {
 	return true;
 }
 
+lista_iter_t* encontrar_en_hash_segun_clave(const hash_t* hash, const char* clave) {
+	unsigned long indice = hashing(clave, hash->largo);
+	lista_iter_t* iter = lista_iter_crear(hash->tabla[indice]);
+	if (iter == NULL) return NULL;
+
+	hash_campo_t* campo = lista_iter_ver_actual(iter);
+	while (!lista_iter_al_final(iter) && strcmp(campo->clave,clave) != 0) {
+		lista_iter_avanzar(iter);
+		campo = lista_iter_ver_actual(iter);
+	}
+	return iter;
+}
+
 /* *****************************************************************
  *            FUNCIONES AUXILIARES PARA ITERADOR DE HASH
  * *****************************************************************/
@@ -210,62 +223,42 @@ bool hash_guardar(hash_t* hash, const char* clave, void* dato) {
 }
 
 void* hash_borrar(hash_t* hash, const char* clave) {
-	if (!hash_pertenece(hash, clave)) return NULL;
-
 	if (!redimensionamiento(hash)) return NULL;
 
-	unsigned long indice = hashing(clave, hash->largo);
-	lista_iter_t* iter = lista_iter_crear(hash->tabla[indice]);
+	lista_iter_t* iter = encontrar_en_hash_segun_clave(hash, clave);
 	if (iter == NULL) return NULL;
-
-	hash_campo_t* campo = lista_iter_ver_actual(iter);
-	while (strcmp(campo->clave,clave) != 0) {
-		lista_iter_avanzar(iter);
-		campo = lista_iter_ver_actual(iter);
+	if (lista_iter_al_final(iter)) {
+		lista_iter_destruir(iter);
+		return NULL;
 	}
 
 	hash->cantidad--;
-	campo = lista_iter_borrar(iter);
+	hash_campo_t* campo = lista_iter_borrar(iter);
 	lista_iter_destruir(iter);
 	void* dato = hash_campo_destruir(campo);
 	return dato;
 }
 
 void* hash_obtener(const hash_t* hash, const char* clave) {
-	if (!hash_pertenece(hash, clave)) return NULL;
-
-	unsigned long indice = hashing(clave, hash->largo);
-	lista_iter_t* iter = lista_iter_crear(hash->tabla[indice]);
-	if (iter == NULL) return false;
+	lista_iter_t* iter = encontrar_en_hash_segun_clave(hash, clave);
+	if (iter == NULL) return NULL;
+	if (lista_iter_al_final(iter)) {
+		lista_iter_destruir(iter);
+		return NULL;
+	}
 
 	hash_campo_t* campo = lista_iter_ver_actual(iter);
-	while (strcmp(campo->clave,clave) != 0) {
-		lista_iter_avanzar(iter);
-		campo = lista_iter_ver_actual(iter);
-	}
 	lista_iter_destruir(iter);
-
 	void* dato = campo->dato;
 	return dato;
 }
 
 bool hash_pertenece(const hash_t* hash, const char* clave) {
-	unsigned long indice = hashing(clave, hash->largo);
-	if (hash->tabla[indice] == NULL) return false;
-
-	lista_iter_t* iter = lista_iter_crear(hash->tabla[indice]);
+	lista_iter_t* iter = encontrar_en_hash_segun_clave(hash, clave);
 	if (iter == NULL) return false;
-
-	while(!lista_iter_al_final(iter)) {
-		hash_campo_t* campo = lista_iter_ver_actual(iter);
-		if (strcmp(campo->clave,clave) == 0) {
-				lista_iter_destruir(iter);
-				return true;
-		}
-		lista_iter_avanzar(iter);
-	}
+	bool pertenece = !lista_iter_al_final(iter);
 	lista_iter_destruir(iter);
-	return false;
+	return pertenece;
 }
 
 size_t hash_cantidad(const hash_t* hash) {
