@@ -4,10 +4,10 @@
 #include <ctype.h>
 #include <stdbool.h>
 
-int es_numero(char *n) {
-  size_t i = strlen(n)-1;
-  while (i && isdigit(n[i])) i--;
-  return i == 0 ? 1 : 0;
+bool es_numero(char *n) {
+	size_t i;
+	for (i = strlen(n)-1; i && isdigit(n[i]); i--);
+	return i == 0;
 }
 
 void dividir_archivo(int cantidad_columnas, FILE* archivo_lectura) {
@@ -32,7 +32,7 @@ void dividir_archivo(int cantidad_columnas, FILE* archivo_lectura) {
 }
 
 int validar_cantidad_parametros(int argc, char* argv []) {
-	if (argc < 2 || argc > 3 || es_numero(argv[1]) == 0 || atoi(argv[1]) < 1) {
+	if (argc < 2 || argc > 3 || !es_numero(argv[1]) || atoi(argv[1]) < 1) {
 		fprintf(stderr, "Error: Cantidad erronea de parametros\n");
 		return 0;
 	}
