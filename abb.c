@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdio.h>
 #include "abb.h"
-#include "lista.h"
 #include "pila.h"
 
 typedef struct abb_nodo {

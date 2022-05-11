@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "lista.h"
 
 /* Tipos de función para comparar claves y destruir datos. */
 typedef int (*abb_comparar_clave_t)(const char*, const char*);
