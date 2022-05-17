@@ -5,9 +5,60 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>  // For ssize_t in Linux.}
+#include <stdbool.h>
+#include <unistd.h> // For ssize_t in Linux.
 
 #define NUMERO_PRIMO_GRANDE 5003
+
+/* *****************************************************************
+ *               	FUNCIONES AUXILIARES
+ * *****************************************************************/
+
+bool es_primo (size_t n) {
+	for (int i = 2; i <= n/2; i++) if(n % i == 0) return false;
+	return true;
+}
+
+void cambiar_valores (size_t* a, size_t* b) {
+	size_t temp = *a;
+	*a = *b;
+	*b = temp;
+}
+
+void permutacion_aleatoria (size_t arr[], size_t n) {
+	srand ((unsigned) time(NULL));
+	for (size_t i = n-1; i > 0; i--) {
+		size_t j = rand() % (i+1);
+		cambiar_valores(&arr[i], &arr[j]);
+	}
+}
+
+bool obtener_elementos_in_order(const char* clave, void* valor, void* extra) {
+	char** elementos_obtenidos = (char**)extra;
+	int* i = (int*)elementos_obtenidos[3];
+
+	elementos_obtenidos[*i] = (char*)clave;
+	(*i)++;
+
+	return true;
+}
+
+bool obtener_primer_elemento_in_order(const char* clave, void* valor, void* extra) {
+	*((char**)extra) = (char*)clave;
+	return false;
+}
+
+bool obtener_ultimo_elemento_in_order(const char* clave, void* valor, void* extra) {
+	*((char**)extra) = (char*)clave;
+	return true;
+}
+
+static ssize_t buscar(const char* clave, char* claves[], size_t largo) {
+	for (size_t i = 0; i < largo; i++) {
+		if (strcmp(clave, claves[i]) == 0) return (ssize_t) i;
+	}
+	return -1;
+}
 
 /* ******************************************************************
  *                        PRUEBAS UNITARIAS
@@ -196,25 +247,6 @@ static void prueba_abb_valor_null() {
 	abb_destruir(arbol);
 }
 
-bool es_primo (size_t n) {
-	for (int i = 2; i <= n/2; i++) if(n % i == 0) return false;
-	return true;
-}
-
-void cambiar_valores (size_t* a, size_t* b) {
-	size_t temp = *a;
-	*a = *b;
-	*b = temp;
-}
-
-void permutacion_aleatoria (size_t arr[], size_t n) {
-	srand ((unsigned) time(NULL));
-	for (size_t i = n-1; i > 0; i--) {
-		size_t j = rand() % (i+1);
-		cambiar_valores(&arr[i], &arr[j]);
-	}
-}
-
 static void prueba_abb_volumen(size_t largo, bool debug) {
 	printf("\nINICIO DE PRUEBAS VOLUMEN EN ABB\n");
 	if (!es_primo(largo)) {
@@ -231,7 +263,7 @@ static void prueba_abb_volumen(size_t largo, bool debug) {
 	/* Inserta 'largo' parejas en el ABB */
 	size_t aleatorio[largo];
 	for (size_t i = 0; i < largo; i++) aleatorio[i] = i+1;
-	permutacion_aleatoria (aleatorio, largo);
+	permutacion_aleatoria(aleatorio, largo);
 	bool ok = true;
 	for (unsigned i = 0; i < largo; i++) {
 		valores[i] = malloc(sizeof(int));
@@ -280,15 +312,60 @@ static void prueba_abb_volumen(size_t largo, bool debug) {
 	/* Destruye el ABB - debería liberar los enteros */
 	abb_destruir(arbol);
 }
-static ssize_t buscar(const char* clave, char* claves[], size_t largo) {
-	for (size_t i = 0; i < largo; i++) {
-		if (strcmp(clave, claves[i]) == 0) return (ssize_t) i;
-	}
-	return -1;
+
+static void prueba_in_order_vacio(void) {
+	printf("\nINICIO DE PRUEBAS DE ABB VACIO CON ITERADOR INTERNO\n");
+	abb_t* arbol = abb_crear(strcmp, NULL);
+	
+	/* Pruebas con el iterador interno vacío*/
+	int primero = 0;
+	abb_in_order(arbol, obtener_primer_elemento_in_order, &primero);
+	print_test("El iterador interno no puede obtener el elemento que está al principio si el ABB está vacío", primero == 0);
+	
+	int ultimo = 0;
+	abb_in_order(arbol, obtener_ultimo_elemento_in_order, &ultimo);
+	print_test("El iterador interno no puede obtener el elemento que está al final si el ABB está vacío", ultimo == 0);
+	
+	/* Destruyo lista */
+	abb_destruir(arbol);
+}
+
+static void prueba_abb_in_order() {
+	printf("\nINICIO DE PRUEBAS ITERACION EN ABB (INTERNO)\n");
+	abb_t *arbol = abb_crear(strcmp, NULL);
+
+	char *claves[] = {"perro", "gato", "vaca"};
+	char *valores[] = {"guau", "miau", "mu"}; // In order: miau (1) -> guau (0) -> mu (2)
+
+	/* Inserta 3 valores */
+	print_test("Prueba ABB insertar clave1", abb_guardar(arbol, claves[0], valores[0]));
+	print_test("Prueba ABB insertar clave2", abb_guardar(arbol, claves[1], valores[1]));
+	print_test("Prueba ABB insertar clave3", abb_guardar(arbol, claves[2], valores[2]));
+
+	/* Pruebo que iterar los elementos me los devuelve en in-order */
+	char *claves_obtenidas[] = {"clave_a", "clave_b", "clave_c", "contador"};
+	int contador = 0;
+	claves_obtenidas[3] = (char*)&contador;
+	abb_in_order(arbol, obtener_elementos_in_order, claves_obtenidas);
+	bool ok_obtenidos = true;
+	ok_obtenidos &= (strcmp(claves[0], claves_obtenidas[1]) == 0);
+	ok_obtenidos &= (strcmp(claves[1], claves_obtenidas[0]) == 0);
+	ok_obtenidos &= (strcmp(claves[2], claves_obtenidas[2]) == 0);
+	print_test("Se pudieron obtener las claves de todos los elementos", ok_obtenidos);
+
+	char *primero;
+	abb_in_order(arbol, obtener_primer_elemento_in_order, &primero);
+	print_test("Se pudo obtener la clave del elemento que está al principio", strcmp(claves[1], primero) == 0);
+
+	char *ultimo;
+	abb_in_order(arbol, obtener_ultimo_elemento_in_order, &ultimo);
+	print_test("Se pudo obtener la clave del elemento que está al final", strcmp(claves[2], ultimo) == 0);
+
+	abb_destruir(arbol);
 }
 
 static void prueba_abb_iterar() {
-	printf("\nINICIO DE PRUEBAS ITERACION EN ABB\n");
+	printf("\nINICIO DE PRUEBAS ITERACION EN ABB (EXTERNO)\n");
 	abb_t* arbol = abb_crear(strcmp, NULL);
 
 	char *claves[] = {"perro", "gato", "vaca"};
@@ -299,7 +376,7 @@ static void prueba_abb_iterar() {
 	print_test("Prueba ABB insertar clave2", abb_guardar(arbol, claves[1], valores[1]));
 	print_test("Prueba ABB insertar clave3", abb_guardar(arbol, claves[2], valores[2]));
 
-	// Prueba de iteración sobre las claves almacenadas.
+	/* Prueba de iteración sobre las claves almacenadas */
 	abb_iter_t* iter = abb_iter_in_crear(arbol);
 	const char *clave;
 	ssize_t indice;
@@ -364,7 +441,7 @@ static void prueba_abb_iterar_volumen(size_t largo) {
 		if (!ok) break;
 	}
 
-	// Prueba de iteración sobre las claves almacenadas.
+	/* Prueba de iteración sobre las claves almacenadas */
 	abb_iter_t* iter = abb_iter_in_crear(arbol);
 	print_test("Prueba ABB iterador esta al final, es false", !abb_iter_in_al_final(iter));
 
@@ -424,6 +501,8 @@ void pruebas_abb_estudiante() {
 	prueba_abb_clave_vacia();
 	prueba_abb_valor_null();
 	prueba_abb_volumen(NUMERO_PRIMO_GRANDE, true);
+	prueba_in_order_vacio();
+	prueba_abb_in_order();
 	prueba_abb_iterar();
 	prueba_abb_iterar_volumen(NUMERO_PRIMO_GRANDE);
 }
@@ -432,11 +511,11 @@ void pruebas_abb_estudiante() {
  * Función main() que llama a la función de pruebas.
  */
 
-#ifndef CORRECTOR  // Para que no dé conflicto con el main() del corrector.
+#ifndef CORRECTOR // Para que no dé conflicto con el main() del corrector.
 
 int main(void) {
 	pruebas_abb_estudiante();
-	return failure_count() > 0;  // Indica si falló alguna prueba.
+	return failure_count() > 0; // Indica si falló alguna prueba.
 }
 
 #endif

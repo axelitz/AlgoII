@@ -43,7 +43,7 @@ bool abb_pertenece(const abb_t* arbol, const char* clave);
 /* Devuelve la cantidad de elementos del ABB.
  * Pre: La estructura ABB fue inicializada
  */
-size_t abb_cantidad(abb_t* arbol);
+size_t abb_cantidad(const abb_t* arbol);
 
 /* Destruye la estructura liberando la memoria pedida y llamando a la función destruir para cada par (clave, dato).
  * Pre: La estructura ABB fue inicializada

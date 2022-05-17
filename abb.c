@@ -27,7 +27,7 @@ struct abb_iter {
 /* *****************************************************************
  *             FUNCIONES AUXILIARES PARA NODO DE ABB
  * *****************************************************************/
- 
+
 char* strdup(const char* org) {
 	char* cpy = malloc(sizeof(char) * (strlen(org) + 1));
 	if (!cpy) return NULL;
@@ -89,20 +89,35 @@ void* eliminar_padre_de_un_hijo(abb_nodo_t* nodo, abb_nodo_t* padre, abb_compara
 	return dato;
 }
 
-char* encontrar_siguiente_in_order(abb_nodo_t* nodo, const char* clave_a_comparar, abb_comparar_clave_t cmp) {
+abb_nodo_t* minimo_valor(abb_nodo_t* nodo) {
+	abb_nodo_t* actual = nodo;
+	while (actual->izq != NULL) actual = actual->izq;
+	return actual;
+}
+
+abb_nodo_t* encontrar_padre(abb_nodo_t* nodo, abb_comparar_clave_t cmp, char* clave) {
 	if (nodo == NULL) return NULL;
 
-	char* por_izquierda = encontrar_siguiente_in_order(nodo->izq, clave_a_comparar, cmp);
-	if (por_izquierda != NULL) return por_izquierda;
+	if (cmp(clave, nodo->der->clave) == 0 || cmp(clave, nodo->izq->clave) == 0) return nodo;
+	int comparacion_claves = cmp(clave, nodo->clave);
+	return comparacion_claves > 0 ? encontrar_padre(nodo->der, cmp, clave) : encontrar_padre(nodo->izq, cmp, clave);
+}
 
-	if (cmp(clave_a_comparar, nodo->clave) < 0) return strdup(nodo->clave);
+char* encontrar_siguiente_in_order(abb_nodo_t* nodo, abb_t* arbol) {
+	if (nodo->der != NULL) return strdup(minimo_valor(nodo->der)->clave);
 
-	char* por_derecha = encontrar_siguiente_in_order(nodo->der, clave_a_comparar, cmp);
-	return por_derecha;
+	// step 2 of the above algorithm
+	abb_nodo_t* n = nodo;
+	abb_nodo_t* p = encontrar_padre(arbol->raiz, arbol->cmp, n->clave);
+	while (p != NULL && nodo == p->der) {
+		n = p;
+		p = encontrar_padre(arbol->raiz, arbol->cmp, n->clave);
+	}
+	return p != NULL ? strdup(p->clave) : NULL;
 }
 
 void* eliminar_padre_de_dos_hijos(abb_nodo_t* nodo, abb_t* arbol) {
-	char* clave_reemplazante = encontrar_siguiente_in_order(arbol->raiz, nodo->clave, arbol->cmp);
+	char* clave_reemplazante = encontrar_siguiente_in_order(nodo, arbol);
 	if (clave_reemplazante == NULL) return NULL;
 	void* dato_reemplazante = abb_borrar(arbol, clave_reemplazante);
 
@@ -137,12 +152,12 @@ void* abb_borrar_segun_hijos(abb_nodo_t* nodo, abb_nodo_t* padre, abb_t* arbol, 
 abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato) {
 	abb_t* arbol = malloc(sizeof(abb_t));
 	if (arbol == NULL) return NULL;
-	
+
 	arbol->raiz = NULL;
 	arbol->cmp = cmp;
 	arbol->destruir_dato = destruir_dato;
 	arbol->cant = 0;
-	
+
 	return arbol;
 }
 
@@ -207,7 +222,7 @@ bool abb_pertenece(const abb_t* arbol, const char* clave) {
 	return _abb_pertenece(arbol->raiz, arbol, clave);
 }
 
-size_t abb_cantidad(abb_t* arbol) {
+size_t abb_cantidad(const abb_t* arbol) {
 	return arbol->cant;
 }
 
@@ -232,7 +247,7 @@ void abb_destruir(abb_t* arbol) {
 
 bool _abb_in_order(abb_nodo_t* nodo, bool visitar(const char*, void*, void*), void *extra) {
 	if (nodo == NULL) return true;
-
+	
 	if (!_abb_in_order(nodo->izq, visitar, extra)) return false;
 	if (!visitar(nodo->clave, nodo->dato, extra)) return false;
 	return _abb_in_order(nodo->der, visitar, extra);
@@ -250,7 +265,7 @@ void abb_in_order(abb_t* arbol, bool visitar(const char*, void*, void*), void* e
 abb_iter_t* abb_iter_in_crear(const abb_t* arbol) {
 	abb_iter_t* iter = malloc(sizeof(abb_iter_t*));
 	if (iter == NULL) return NULL;
-	
+
 	iter->pila = pila_crear();
 	if (iter->pila == NULL) {
 		free(iter);
@@ -265,16 +280,16 @@ abb_iter_t* abb_iter_in_crear(const abb_t* arbol) {
 		}
 		nodo = nodo->izq;
 	}
-	
+
 	return iter;
 }
 
 bool abb_iter_in_avanzar(abb_iter_t *iter) {
 	if (abb_iter_in_al_final(iter)) return false;
-	
+
 	abb_nodo_t* nodo_desapilado = pila_desapilar(iter->pila);
 	abb_nodo_t* nodo_tope = pila_ver_tope(iter->pila);
-	
+
 	abb_nodo_t* nodo_apilar = nodo_desapilado->der;
 	while (nodo_apilar != NULL) {
 		if (!pila_apilar(iter->pila, nodo_apilar)) {
