@@ -351,7 +351,7 @@ static void prueba_abb_in_order() {
 	ok_obtenidos &= (strcmp(claves[0], claves_obtenidas[1]) == 0);
 	ok_obtenidos &= (strcmp(claves[1], claves_obtenidas[0]) == 0);
 	ok_obtenidos &= (strcmp(claves[2], claves_obtenidas[2]) == 0);
-	print_test("Se pudieron obtener las claves de todos los elementos", ok_obtenidos);
+	print_test("Se pudieron obtener las claves de todos los elementos en el orden correcto", ok_obtenidos);
 
 	char *primero;
 	abb_in_order(arbol, obtener_primer_elemento_in_order, &primero);
@@ -368,8 +368,8 @@ static void prueba_abb_iterar() {
 	printf("\nINICIO DE PRUEBAS ITERACION EN ABB (EXTERNO)\n");
 	abb_t* arbol = abb_crear(strcmp, NULL);
 
-	char *claves[] = {"perro", "gato", "vaca"};
-	char *valores[] = {"guau", "miau", "mu"};
+	char *claves[] = {"perro", "gato", "vaca"}; // In order: gato (1) -> perro (0) -> vaca (2)
+	char *valores[] = {"guau", "miau", "mu"}; // In order: miau (1) -> guau (0) -> mu (2)
 
 	/* Inserta 3 valores */
 	print_test("Prueba ABB insertar clave1", abb_guardar(arbol, claves[0], valores[0]));
@@ -388,6 +388,7 @@ static void prueba_abb_iterar() {
 	indice = buscar(clave, claves, sizeof(claves) / sizeof(char *));
 	print_test("Prueba ABB iterador ver actual, es una clave valida", indice != -1);
 	print_test("Prueba ABB iterador ver actual, no es el mismo puntero", clave != claves[indice]);
+	print_test("Prueba ABB obtenida clave1 correcta", strcmp(claves[1], clave) == 0);
 	print_test("Prueba ABB iterador avanzar es true", abb_iter_in_avanzar(iter));
 	print_test("Prueba ABB iterador esta al final, es false", !abb_iter_in_al_final(iter));
 
@@ -396,6 +397,7 @@ static void prueba_abb_iterar() {
 	indice = buscar(clave, claves, sizeof(claves) / sizeof(char *));
 	print_test("Prueba ABB iterador ver actual, es una clave valida", indice != -1);
 	print_test("Prueba ABB iterador ver actual, no es el mismo puntero", clave != claves[indice]);
+	print_test("Prueba ABB obtenida clave2 correcta", strcmp(claves[0], clave) == 0);
 	print_test("Prueba ABB iterador avanzar es true", abb_iter_in_avanzar(iter));
 	print_test("Prueba ABB iterador esta al final, es false", !abb_iter_in_al_final(iter));
 
@@ -404,6 +406,7 @@ static void prueba_abb_iterar() {
 	indice = buscar(clave, claves, sizeof(claves) / sizeof(char *));
 	print_test("Prueba ABB iterador ver actual, es una clave valida", indice != -1);
 	print_test("Prueba ABB iterador ver actual, no es el mismo puntero", clave != claves[indice]);
+	print_test("Prueba ABB obtenida clave3 correcta", strcmp(claves[2], clave) == 0);
 	abb_iter_in_avanzar(iter);
 	print_test("Prueba ABB iterador esta al final, es true", abb_iter_in_al_final(iter));
 
@@ -441,14 +444,14 @@ static void prueba_abb_iterar_volumen(size_t largo) {
 		if (!ok) break;
 	}
 
-	/* Prueba de iteración sobre las claves almacenadas */
+	/* Prueba de iteración sobre las claves almacenadas (iteración in-order) */
 	abb_iter_t* iter = abb_iter_in_crear(arbol);
 	print_test("Prueba ABB iterador esta al final, es false", !abb_iter_in_al_final(iter));
 
 	ok = true;
 	unsigned i;
 	const char *clave;
-	size_t *valor;
+	char *clave_actual = malloc(sizeof(char *) * largo_clave);
 
 	for (i = 0; i < largo; i++) {
 		if (abb_iter_in_al_final(iter)) {
@@ -456,6 +459,32 @@ static void prueba_abb_iterar_volumen(size_t largo) {
 			break;
 		}
 		clave = abb_iter_in_ver_actual(iter);
+		sprintf(clave_actual, "%08ld", valores[i]);
+		ok = (strcmp(clave_actual, clave) == 0);
+		if (!ok) break;
+		abb_iter_in_avanzar(iter);
+	}
+	print_test("Prueba ABB iteración en volumen, obtenidas las claves en el orden correcto", ok);
+	print_test("Prueba ABB iteración en volumen, recorrio todo el largo", i == largo);
+	print_test("Prueba ABB iterador esta al final, es true", abb_iter_in_al_final(iter));
+
+	free(clave_actual);
+	abb_iter_in_destruir(iter);
+	print_test("Prueba ABB destruir primer iterador es true", true);
+
+	/* Otra prueba de iteración sobre las claves almacenadas */
+	abb_iter_t* iter_dos = abb_iter_in_crear(arbol);
+	print_test("Prueba ABB segundo iterador esta al final, es false", !abb_iter_in_al_final(iter_dos));
+
+	ok = true;
+	size_t *valor;
+
+	for (i = 0; i < largo; i++) {
+		if (abb_iter_in_al_final(iter_dos)) {
+			ok = false;
+			break;
+		}
+		clave = abb_iter_in_ver_actual(iter_dos);
 		if (clave == NULL) {
 			ok = false;
 			break;
@@ -466,11 +495,11 @@ static void prueba_abb_iterar_volumen(size_t largo) {
 			break;
 		}
 		*valor = largo;
-		abb_iter_in_avanzar(iter);
+		abb_iter_in_avanzar(iter_dos);
 	}
 	print_test("Prueba ABB iteración en volumen", ok);
 	print_test("Prueba ABB iteración en volumen, recorrio todo el largo", i == largo);
-	print_test("Prueba ABB iterador esta al final, es true", abb_iter_in_al_final(iter));
+	print_test("Prueba ABB iterador esta al final, es true", abb_iter_in_al_final(iter_dos));
 
 	ok = true;
 	for (i = 0; i < largo; i++) {
@@ -479,10 +508,10 @@ static void prueba_abb_iterar_volumen(size_t largo) {
 			break;
 		}
 	}
-	print_test("Prueba ABB iteración en volumen, se cambiaron todo los elementos", ok);
+	print_test("Prueba ABB iteración en volumen, se cambiaron todos los elementos", ok);
 
 	free(claves);
-	abb_iter_in_destruir(iter);
+	abb_iter_in_destruir(iter_dos);
 	abb_destruir(arbol);
 }
 
