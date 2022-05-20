@@ -82,7 +82,6 @@ void* heap_ver_max(const heap_t* heap);
  */
 void* heap_desencolar(heap_t* heap);
 
-
 void pruebas_heap_estudiante(void);
 
 #endif  // HEAP_H
