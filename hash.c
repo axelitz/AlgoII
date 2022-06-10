@@ -1,8 +1,8 @@
-#include "hash.h"
-#include "lista.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "hash.h"
+#include "lista.h"
 
 #define TAM_INICIAL 101
 #define ALFA_MINIMO 0.25f
@@ -53,7 +53,7 @@ unsigned long hashing(const char *s, unsigned long m) {
 /* *****************************************************************
  *             FUNCIONES AUXILIARES PARA CAMPO DE HASH
  * *****************************************************************/
- 
+
 char* strdup(const char* org) {
 	char* cpy = malloc(sizeof(char) * (strlen(org) + 1));
 	if (!cpy) return NULL;
